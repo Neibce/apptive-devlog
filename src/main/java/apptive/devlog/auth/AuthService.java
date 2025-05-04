@@ -81,9 +81,12 @@ public class AuthService {
         refreshTokenRepository.deleteByUserEmail(email);
     }
 
-    public String refresh(String refreshToken) {
-        String userEmail = refreshTokenRepository.findByToken(refreshToken).getUserEmail();
-        return tokenProvider.generateAccessToken(userEmail);
+    public String refresh(String refreshTokenString) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenString);
+        if(refreshToken == null || refreshToken.getExpiry().isBefore(LocalDateTime.now()))
+            throw new BadCredentialsException("RefreshToken이 바르지 않습니다.");
+
+        return tokenProvider.generateAccessToken(refreshToken.getUserEmail());
     }
 
     private boolean validatePassword(String password) {
