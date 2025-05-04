@@ -5,6 +5,7 @@ import apptive.devlog.common.CommonResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NicknameAlreadyExistsException.class)
-    public ResponseEntity<CommonResponse<Void>> handleInvalidPassword(NicknameAlreadyExistsException exception) {
+    public ResponseEntity<CommonResponse<Void>> handleNicknameAlreadyExists(NicknameAlreadyExistsException exception) {
         return CommonResponse.buildResponseEntity(HttpStatus.CONFLICT, exception.getMessage());
     }
 
@@ -34,7 +35,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<CommonResponse<Void>> handleValidationError(BadCredentialsException exception) {
+    public ResponseEntity<CommonResponse<Void>> handleBadCredentials(BadCredentialsException exception) {
+        return CommonResponse.buildResponseEntity(HttpStatus.UNAUTHORIZED, "인증 정보가 잘못되었습니다.");
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<CommonResponse<Void>> handleUserDisabled(DisabledException exception) {
         return CommonResponse.buildResponseEntity(HttpStatus.UNAUTHORIZED, "인증 정보가 잘못되었습니다.");
     }
 

@@ -41,7 +41,7 @@ public class UserController {
     public ResponseEntity<?> deleteUser(
             @RequestBody @Valid DeleteUserRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        userService.deleteUser(userDetails.getUsername(), request.password());
+        userService.deactivateUser(userDetails.getUsername(), request.password());
         return CommonResponse.buildResponseEntity(HttpStatus.OK, "정상적으로 탈퇴되었습니다.");
     }
 }

@@ -1,8 +1,7 @@
-package apptive.devlog.config;
+package apptive.devlog.security;
 
 import apptive.devlog.auth.token.AuthenticationFilter;
 import apptive.devlog.auth.token.TokenProvider;
-import apptive.devlog.user.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

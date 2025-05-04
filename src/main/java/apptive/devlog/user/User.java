@@ -37,6 +37,10 @@ public class User {
     @Column(nullable = false)
     private Gender gender;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isActive = true;
+
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;

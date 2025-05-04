@@ -1,5 +1,6 @@
 package apptive.devlog.user;
 
+import apptive.devlog.auth.token.RefreshTokenRepository;
 import apptive.devlog.user.dto.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
@@ -37,11 +39,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUser(String email, String password) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password));
+    public void deactivateUser(String email, String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("이메일 오류"));
-        userRepository.delete(user);
+
+        user.setActive(false);
+        userRepository.save(user);
+
+        refreshTokenRepository.deleteByUserEmail(email);
     }
 }
