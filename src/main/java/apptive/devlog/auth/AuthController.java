@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "회원 가입", description = "회원으로 가입합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "입가 성공", content = @Content(schema = @Schema(implementation = CommonResponse.class)))})
+            @ApiResponse(responseCode = "201", description = "가입 성공", content = @Content(schema = @Schema(implementation = CommonResponse.class)))})
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
         authService.register(request);
         return CommonResponse.buildResponseEntity(HttpStatus.CREATED, "성공적으로 가입되었습니다.");
