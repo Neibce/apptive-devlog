@@ -2,6 +2,7 @@ package apptive.devlog.user;
 
 
 import apptive.devlog.common.CommonResponse;
+import apptive.devlog.security.CustomUserDetails;
 import apptive.devlog.user.dto.DeleteUserRequest;
 import apptive.devlog.user.dto.UpdateUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,8 +29,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "정보 수정 성공", content = @Content(schema = @Schema(implementation = CommonResponse.class)))})
     public ResponseEntity<?> updateUser(
             @RequestBody @Valid UpdateUserRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        userService.updateUser(userDetails.getUsername(), request);
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.updateUser(userDetails.getUser(), request);
         return CommonResponse.buildResponseEntity(HttpStatus.OK, "회원정보가 수정되었습니다.");
     }
 
@@ -40,8 +40,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "탈퇴 성공", content = @Content(schema = @Schema(implementation = CommonResponse.class)))})
     public ResponseEntity<?> deleteUser(
             @RequestBody @Valid DeleteUserRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        userService.deactivateUser(userDetails.getUsername(), request.password());
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.deactivateUser(userDetails.getUser(), request.password());
         return CommonResponse.buildResponseEntity(HttpStatus.OK, "정상적으로 탈퇴되었습니다.");
     }
 }

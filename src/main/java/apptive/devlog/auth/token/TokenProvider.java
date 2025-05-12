@@ -1,13 +1,13 @@
 package apptive.devlog.auth.token;
 
+import apptive.devlog.security.CustomUserDetails;
+import apptive.devlog.security.CustomUserDetailsService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Component
 public class TokenProvider {
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -85,7 +85,7 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getEmailFromAccessToken(token));
+        CustomUserDetails userDetails = userDetailsService.loadUserByUsername(getEmailFromAccessToken(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 }
