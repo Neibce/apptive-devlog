@@ -1,7 +1,7 @@
 package apptive.devlog.user;
 
 import apptive.devlog.auth.token.RefreshTokenRepository;
-import apptive.devlog.user.dto.UpdateUserRequest;
+import apptive.devlog.user.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +18,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public void updateUser(User user, UpdateUserRequest request) {
+    public void updateUser(User user, UserUpdateRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getEmail(), request.oldPassword()));
 

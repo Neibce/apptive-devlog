@@ -3,8 +3,8 @@ package apptive.devlog.user;
 
 import apptive.devlog.common.CommonResponse;
 import apptive.devlog.security.CustomUserDetails;
-import apptive.devlog.user.dto.DeleteUserRequest;
-import apptive.devlog.user.dto.UpdateUserRequest;
+import apptive.devlog.user.dto.UserDeleteRequest;
+import apptive.devlog.user.dto.UserUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,7 +28,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정보 수정 성공", content = @Content(schema = @Schema(implementation = CommonResponse.class)))})
     public ResponseEntity<?> updateUser(
-            @RequestBody @Valid UpdateUserRequest request,
+            @RequestBody @Valid UserUpdateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.updateUser(userDetails.getUser(), request);
         return CommonResponse.buildResponseEntity(HttpStatus.OK, "회원정보가 수정되었습니다.");
@@ -39,7 +39,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "탈퇴 성공", content = @Content(schema = @Schema(implementation = CommonResponse.class)))})
     public ResponseEntity<?> deleteUser(
-            @RequestBody @Valid DeleteUserRequest request,
+            @RequestBody @Valid UserDeleteRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.deactivateUser(userDetails.getUser(), request.password());
         return CommonResponse.buildResponseEntity(HttpStatus.OK, "정상적으로 탈퇴되었습니다.");
