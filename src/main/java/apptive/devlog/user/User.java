@@ -17,9 +17,11 @@ import java.util.UUID;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class User {
     @Id
     @GeneratedValue
+    @EqualsAndHashCode.Include
     @Column(nullable = false, updatable = false)
     private UUID uuid;
 
