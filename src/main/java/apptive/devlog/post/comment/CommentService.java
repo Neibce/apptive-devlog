@@ -5,8 +5,10 @@ import apptive.devlog.post.PostRepository;
 import apptive.devlog.post.comment.dto.CommentCreateRequest;
 import apptive.devlog.post.comment.dto.CommentData;
 import apptive.devlog.post.comment.dto.CommentUpdateRequest;
+import apptive.devlog.post.comment.event.CommentCreatedEvent;
 import apptive.devlog.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public void createComment(Long postId, CommentCreateRequest request, User user) {
         Post post = postRepository.findById(postId)
@@ -37,6 +40,21 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+        applicationEventPublisher.publishEvent(
+                new CommentCreatedEvent(
+                        parent == null,
+
+                        post.getTitle(),
+                        post.getAuthor().getEmail(),
+                        post.getAuthor().getUuid(),
+
+                        parent != null ? parent.getAuthor().getUuid() : null,
+                        parent != null ? parent.getAuthor().getEmail() : null,
+                        parent != null ? parent.getContent() : null,
+
+                        comment.getAuthor().getUuid(),
+                        comment.getAuthor().getNickname(),
+                        comment.getContent()));
     }
 
     @Transactional(readOnly = true)
@@ -48,25 +66,6 @@ public class CommentService {
                 .filter(comment -> comment.getParent() == null && (!comment.isDeleted() || !comment.getReplies().isEmpty()))
                 .map(comment -> toDto(comment, user))
                 .toList();
-    }
-
-    private CommentData toDto(Comment comment, User user) {
-        CommentData.CommentDataBuilder commentDataBuilder = CommentData.builder()
-                .uuid(comment.getUuid())
-                .content(comment.isDeleted() ? "(삭제된 댓글)" : comment.getContent())
-                .isDeleted(comment.isDeleted())
-                .isCommentOwner(comment.getAuthor().equals(user))
-                .replies(comment.getReplies().stream()
-                        .filter(reply -> !reply.isDeleted() || !reply.getReplies().isEmpty())
-                        .map(reply -> toDto(reply, user))
-                        .toList());
-
-        if (!comment.isDeleted()) {
-            commentDataBuilder = commentDataBuilder.authorNickname(comment.getAuthor().getNickname())
-                    .createdAt(comment.getCreatedAt());
-        }
-
-        return commentDataBuilder.build();
     }
 
     public void updateComment(UUID commentId,
@@ -91,4 +90,22 @@ public class CommentService {
         comment.setDeleted(true);
     }
 
+    private CommentData toDto(Comment comment, User user) {
+        CommentData.CommentDataBuilder commentDataBuilder = CommentData.builder()
+                .uuid(comment.getUuid())
+                .content(comment.isDeleted() ? "(삭제된 댓글)" : comment.getContent())
+                .isDeleted(comment.isDeleted())
+                .isCommentOwner(comment.getAuthor().equals(user))
+                .replies(comment.getReplies().stream()
+                        .filter(reply -> !reply.isDeleted() || !reply.getReplies().isEmpty())
+                        .map(reply -> toDto(reply, user))
+                        .toList());
+
+        if (!comment.isDeleted()) {
+            commentDataBuilder = commentDataBuilder.authorNickname(comment.getAuthor().getNickname())
+                    .createdAt(comment.getCreatedAt());
+        }
+
+        return commentDataBuilder.build();
+    }
 }
